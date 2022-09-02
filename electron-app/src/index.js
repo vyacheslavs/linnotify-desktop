@@ -4,7 +4,7 @@ const {
     EMBER_INSPECTOR,
 } = require('electron-devtools-installer');
 const { pathToFileURL } = require('url');
-const { app, BrowserWindow } = require('electron');
+const { app, ipcMain, BrowserWindow, webContents } = require('electron');
 const path = require('path');
 const isDev = require('electron-is-dev');
 const handleFileUrls = require('./handle-file-urls');
@@ -14,6 +14,9 @@ const emberAppURL = pathToFileURL(
     path.join(emberAppDir, 'index.html')
 ).toString();
 
+var notifications = [];
+var _ = require('underscore');
+
 server = require(path.join(__dirname, './rest-api-server.js'));
 
 server.get('/status', function(req, res) {
@@ -22,7 +25,12 @@ server.get('/status', function(req, res) {
   }));
 });
 
-let mainWindow = null;
+server.post('/notify', function(req, res) {
+    createWindow(req.body);
+    res.end(JSON.stringify({
+        status: 'ok',
+   }));
+});
 
 // Uncomment the lines below to enable Electron's crash reporter
 // For more information, see http://electron.atom.io/docs/api/crash-reporter/
@@ -37,10 +45,16 @@ app.on('window-all-closed', () => {
     // do not quit when no windows around
 });
 
-createWindow = ()=>{
+createWindow = (reqbody)=>{
+    let mainWindow = null;
+
     mainWindow = new BrowserWindow({
         width: 800,
         height: 600,
+        webPreferences: {
+            contextIsolation: true,
+            preload: path.join(__dirname, './preload.js'),
+        }
     });
 
     // If you want to open up dev tools programmatically, call
@@ -78,6 +92,12 @@ createWindow = ()=>{
     mainWindow.on('closed', () => {
         mainWindow = null;
     });
+
+    notifications.push({
+        title: reqbody.title,
+        text: reqbody.text,
+        id: mainWindow.webContents.id,
+    });
 };
 
 app.on('ready', async () => {
@@ -93,6 +113,18 @@ app.on('ready', async () => {
 
     await handleFileUrls(emberAppDir);
 });
+
+ipcMain.handle( 'ready', async ( event, data ) => {
+
+    let notification = _.findWhere(notifications, {
+        id: event.sender.id,
+    });
+
+    if (!_.isUndefined(notification)) {
+        webContents.fromId(event.sender.id).send('notification-data', notification);
+        notifications = _.without(notifications, notification);
+    }
+})
 
 // Handle an unhandled error in the main thread
 //
