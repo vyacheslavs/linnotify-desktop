@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 const {
-  default: installExtension,
-  EMBER_INSPECTOR,
+    default: installExtension,
+    EMBER_INSPECTOR,
 } = require('electron-devtools-installer');
 const { pathToFileURL } = require('url');
 const { app, BrowserWindow } = require('electron');
@@ -11,7 +11,7 @@ const handleFileUrls = require('./handle-file-urls');
 
 const emberAppDir = path.resolve(__dirname, '..', 'ember-dist');
 const emberAppURL = pathToFileURL(
-  path.join(emberAppDir, 'index.html')
+    path.join(emberAppDir, 'index.html')
 ).toString();
 
 let mainWindow = null;
@@ -26,67 +26,69 @@ let mainWindow = null;
 // });
 
 app.on('window-all-closed', () => {
-  // do not quit when no windows around
+    // do not quit when no windows around
 });
 
-app.on('ready', async () => {
-  if (isDev) {
-    try {
-      require('devtron').install();
-    } catch (err) {
-      console.log('Failed to install Devtron: ', err);
-    }
-    try {
-      await installExtension(EMBER_INSPECTOR, {
-        loadExtensionOptions: { allowFileAccess: true },
-      });
-    } catch (err) {
-      console.log('Failed to install Ember Inspector: ', err);
-    }
-  }
+createWindow = ()=>{
+    mainWindow = new BrowserWindow({
+        width: 800,
+        height: 600,
+    });
 
-  await handleFileUrls(emberAppDir);
+    // If you want to open up dev tools programmatically, call
+    // mainWindow.openDevTools();
 
-  mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
-  });
-
-  // If you want to open up dev tools programmatically, call
-  // mainWindow.openDevTools();
-
-  // Load the ember application
-  mainWindow.loadURL(emberAppURL);
-
-  // If a loading operation goes wrong, we'll send Electron back to
-  // Ember App entry point
-  mainWindow.webContents.on('did-fail-load', () => {
+    // Load the ember application
     mainWindow.loadURL(emberAppURL);
-  });
 
-  mainWindow.webContents.on('render-process-gone', (_event, details) => {
-    if (details.reason === 'killed' || details.reason === 'clean-exit') {
-      return;
+    // If a loading operation goes wrong, we'll send Electron back to
+    // Ember App entry point
+    mainWindow.webContents.on('did-fail-load', () => {
+        mainWindow.loadURL(emberAppURL);
+    });
+
+    mainWindow.webContents.on('render-process-gone', (_event, details) => {
+        if (details.reason === 'killed' || details.reason === 'clean-exit') {
+            return;
+        }
+        console.log(
+            'Your main window process has exited unexpectedly -- see https://www.electronjs.org/docs/api/web-contents#event-render-process-gone'
+        );
+        console.log('Reason: ' + details.reason);
+    });
+
+    mainWindow.on('unresponsive', () => {
+        console.log(
+            'Your Ember app (or other code) has made the window unresponsive.'
+        );
+    });
+
+    mainWindow.on('responsive', () => {
+        console.log('The main window has become responsive again.');
+    });
+
+    mainWindow.on('closed', () => {
+        mainWindow = null;
+    });
+};
+
+app.on('ready', async () => {
+    if (isDev) {
+        try {
+            require('devtron').install();
+        } catch (err) {
+            console.log('Failed to install Devtron: ', err);
+        }
+        try {
+            await installExtension(EMBER_INSPECTOR, {
+                loadExtensionOptions: { allowFileAccess: true },
+            });
+        } catch (err) {
+            console.log('Failed to install Ember Inspector: ', err);
+        }
     }
-    console.log(
-      'Your main window process has exited unexpectedly -- see https://www.electronjs.org/docs/api/web-contents#event-render-process-gone'
-    );
-    console.log('Reason: ' + details.reason);
-  });
 
-  mainWindow.on('unresponsive', () => {
-    console.log(
-      'Your Ember app (or other code) has made the window unresponsive.'
-    );
-  });
-
-  mainWindow.on('responsive', () => {
-    console.log('The main window has become responsive again.');
-  });
-
-  mainWindow.on('closed', () => {
-    mainWindow = null;
-  });
+    await handleFileUrls(emberAppDir);
 });
 
 // Handle an unhandled error in the main thread
@@ -105,9 +107,9 @@ app.on('ready', async () => {
 // resources (e.g. file descriptors, handles, etc) before shutting down the process. It is
 // not safe to resume normal operation after 'uncaughtException'.
 process.on('uncaughtException', (err) => {
-  console.log('An exception in the main thread was not handled.');
-  console.log(
-    'This is a serious issue that needs to be handled and/or debugged.'
-  );
-  console.log(`Exception: ${err}`);
+    console.log('An exception in the main thread was not handled.');
+    console.log(
+        'This is a serious issue that needs to be handled and/or debugged.'
+    );
+    console.log(`Exception: ${err}`);
 });
