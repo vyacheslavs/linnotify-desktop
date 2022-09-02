@@ -26,9 +26,7 @@ let mainWindow = null;
 // });
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+  // do not quit when no windows around
 });
 
 app.on('ready', async () => {
