@@ -14,6 +14,14 @@ const emberAppURL = pathToFileURL(
     path.join(emberAppDir, 'index.html')
 ).toString();
 
+server = require(path.join(__dirname, './rest-api-server.js'));
+
+server.get('/status', function(req, res) {
+  res.end(JSON.stringify({
+       status: 'ok',
+  }));
+});
+
 let mainWindow = null;
 
 // Uncomment the lines below to enable Electron's crash reporter
