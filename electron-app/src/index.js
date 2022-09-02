@@ -15,6 +15,7 @@ const emberAppURL = pathToFileURL(
 ).toString();
 
 var notifications = [];
+var _ = require('underscore');
 
 server = require(path.join(__dirname, './rest-api-server.js'));
 
@@ -28,7 +29,7 @@ server.post('/notify', function(req, res) {
     createWindow(req.body);
     res.end(JSON.stringify({
         status: 'ok',
-   })); 
+   }));
 });
 
 // Uncomment the lines below to enable Electron's crash reporter
@@ -92,8 +93,6 @@ createWindow = (reqbody)=>{
         mainWindow = null;
     });
 
-    console.log('sending notification data ...');
-
     notifications.push({
         title: reqbody.title,
         text: reqbody.text,
@@ -116,12 +115,14 @@ app.on('ready', async () => {
 });
 
 ipcMain.handle( 'ready', async ( event, data ) => {
-    for (idx=0; idx<notifications.length;idx++) {
-        if (notifications[idx].id == event.sender.id) {
-            webContents.fromId(event.sender.id).send('notification-data', notifications[idx]);
-            notifications.splice(idx,1);
-            break;
-        }
+
+    let notification = _.findWhere(notifications, {
+        id: event.sender.id,
+    });
+
+    if (!_.isUndefined(notification)) {
+        webContents.fromId(event.sender.id).send('notification-data', notification);
+        notifications = _.without(notifications, notification);
     }
 })
 
