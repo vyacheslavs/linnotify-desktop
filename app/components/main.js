@@ -4,7 +4,6 @@ import { tracked } from '@glimmer/tracking';
 /*global api*/
 
 export default class MainComponent extends Component {
-
   @tracked title = '';
   @tracked text = '';
   @tracked winId = undefined;
