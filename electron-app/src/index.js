@@ -75,11 +75,6 @@ createWindow = ()=>{
 app.on('ready', async () => {
     if (isDev) {
         try {
-            require('devtron').install();
-        } catch (err) {
-            console.log('Failed to install Devtron: ', err);
-        }
-        try {
             await installExtension(EMBER_INSPECTOR, {
                 loadExtensionOptions: { allowFileAccess: true },
             });
