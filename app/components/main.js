@@ -11,12 +11,13 @@ export default class MainComponent extends Component {
   constructor(owner, args) {
     super(owner, args);
 
-    api.handle('notification-data', (data) => {
-      this.title = data.title;
-      this.text = data.text;
-      this.winId = data.id;
-    });
-
-    api.send('ready', 'ready to listen');
+    if (typeof api !== 'undefined') {
+      api.handle('notification-data', (data) => {
+        this.title = data.title;
+        this.text = data.text;
+        this.winId = data.id;
+      });
+      api.send('ready', 'ready to listen');
+    }
   }
 }
