@@ -1,5 +1,6 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
+import { action } from '@ember/object';
 
 /*global api*/
 
@@ -19,5 +20,10 @@ export default class MainComponent extends Component {
       });
       api.send('ready', 'ready to listen');
     }
+  }
+
+  @action
+  closeWindow() {
+    api.send('control', 'close');
   }
 }
