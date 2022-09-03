@@ -19,17 +19,19 @@ var _ = require('underscore');
 
 server = require(path.join(__dirname, './rest-api-server.js'));
 
-server.get('/status', function(req, res) {
-  res.end(JSON.stringify({
-       status: 'ok',
-  }));
-});
-
-server.post('/notify', function(req, res) {
-    createWindow(req.body);
+server.get('/status', function (req, res) {
     res.end(JSON.stringify({
         status: 'ok',
-   }));
+    }));
+});
+
+server.post('/notify', function (req, res) {
+
+    createWindow(req.body);
+
+    res.end(JSON.stringify({
+        status: 'ok',
+    }));
 });
 
 // Uncomment the lines below to enable Electron's crash reporter
@@ -45,7 +47,46 @@ app.on('window-all-closed', () => {
     // do not quit when no windows around
 });
 
-createWindow = (reqbody)=>{
+createWindow = (reqbody) => {
+
+    let notification = _.findWhere(notifications, {
+        notify_id: reqbody.id,
+        package: reqbody.package,
+    });
+
+    let new_notification = _.defaults(
+        {
+            title: reqbody.title,
+            text: reqbody.text,
+            notify_id: reqbody.id,
+            removal: reqbody.removal,
+            package: reqbody.package,
+            ...(!_.isUndefined(reqbody.big_text)) && { big_text: reqbody.big_text },
+            ...(!_.isUndefined(reqbody.progress)) && { progress: reqbody.progress },
+            ...(!_.isUndefined(reqbody.progress_indeterminate)) && { progress_indeterminate: reqbody.progress_indeterminate },
+            ...(!_.isUndefined(reqbody.progress_max)) && { progress_max: reqbody.progress_max },
+            ...(!_.isUndefined(reqbody.icon)) && { icon: reqbody.icon },
+        },
+        {
+            big_text: "",
+            progress: 0,
+            progress_max: 0,
+            progress_indeterminate: false,
+            icon: "",
+        });
+
+    if (!_.isUndefined(notification)) {
+        // send update to this window
+        new_notification = _.defaults(new_notification, {id:notification.id});
+        webContents.fromId(notification.id).send('notification-data', new_notification);
+        notifications = _.without(notifications, notification);
+        notifications.push(new_notification);
+        return;
+    }
+
+    if (new_notification.removal) // do not show new notification for removal
+        return;
+
     let mainWindow = null;
 
     mainWindow = new BrowserWindow({
@@ -89,15 +130,20 @@ createWindow = (reqbody)=>{
         console.log('The main window has become responsive again.');
     });
 
-    mainWindow.on('closed', () => {
-        mainWindow = null;
+    mainWindow.on('close', (event) => {
+
+        let notification = _.findWhere(notifications, {
+            id: event.sender.webContents.id
+        });
+
+        if (!_.isUndefined(notification)) {
+            notifications = _.without(notifications, notification);
+            console.log(notifications);
+        }
     });
 
-    notifications.push({
-        title: reqbody.title,
-        text: reqbody.text,
-        id: mainWindow.webContents.id,
-    });
+    new_notification = _.defaults(new_notification, {id:mainWindow.webContents.id});
+    notifications.push(new_notification);
 };
 
 app.on('ready', async () => {
@@ -114,7 +160,7 @@ app.on('ready', async () => {
     await handleFileUrls(emberAppDir);
 });
 
-ipcMain.handle( 'ready', async ( event, data ) => {
+ipcMain.handle('ready', async (event, data) => {
 
     let notification = _.findWhere(notifications, {
         id: event.sender.id,
@@ -122,7 +168,6 @@ ipcMain.handle( 'ready', async ( event, data ) => {
 
     if (!_.isUndefined(notification)) {
         webContents.fromId(event.sender.id).send('notification-data', notification);
-        notifications = _.without(notifications, notification);
     }
 })
 
