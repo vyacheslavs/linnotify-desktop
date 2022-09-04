@@ -24,10 +24,10 @@ export default class MainComponent extends Component {
 
   @action
   closeWindow() {
-    api.send('control', {action: 'close'});
+    api.send('control', { action: 'close' });
   }
 
-  didRender(entry) {
-    api.send('control', {action: 'resize', width: entry.borderBoxSize[0].inlineSize, height: entry.borderBoxSize[0].blockSize});
+  onRender(entry) {
+    api.send('control', { action: 'resize', width: entry.borderBoxSize[0].inlineSize, height: entry.borderBoxSize[0].blockSize });
   }
 }
