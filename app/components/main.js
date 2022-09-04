@@ -19,8 +19,7 @@ export default class MainComponent extends Component {
         this.text = data.text;
         this.winId = data.id;
         this.icon = '';
-        if (typeof data.icon != 'undefined')
-          this.icon = data.icon;
+        if (typeof data.icon != 'undefined') this.icon = data.icon;
       });
       api.send('ready', 'ready to listen');
     }
