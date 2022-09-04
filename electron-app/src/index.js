@@ -8,13 +8,18 @@ const { app, ipcMain, BrowserWindow, webContents } = require('electron');
 const path = require('path');
 const isDev = require('electron-is-dev');
 const handleFileUrls = require('./handle-file-urls');
+const { LinWindow, LinWindowManager } = require('./linwindow');
 
 const emberAppDir = path.resolve(__dirname, '..', 'ember-dist');
 const emberAppURL = pathToFileURL(
     path.join(emberAppDir, 'index.html')
 ).toString();
 
-var notifications = [];
+// each package equals to window
+// each window can have a lot of notifications
+
+var lwm = new LinWindowManager();
+
 var _ = require('underscore');
 
 server = require(path.join(__dirname, './rest-api-server.js'));
@@ -47,13 +52,9 @@ app.on('window-all-closed', () => {
     // do not quit when no windows around
 });
 
-var mainWindow = null;
-
 createWindow = (reqbody) => {
 
-    let notification = _.findWhere(notifications, {
-        package: reqbody.package,
-    });
+    let lw = lwm.findWindow(reqbody.package);
 
     let new_notification = _.defaults(
         {
@@ -76,12 +77,10 @@ createWindow = (reqbody) => {
             icon: "",
         });
 
-    if (!_.isUndefined(notification)) {
+    if (!_.isUndefined(lw)) {
         // send update to this window
-        new_notification = _.defaults(new_notification, {id:notification.id});
-        webContents.fromId(notification.id).send('notification-data', new_notification);
-        notifications = _.without(notifications, notification);
-        notifications.push(new_notification);
+        webContents.fromId(lw.id()).send('notification-data', new_notification);
+        lw.push(new_notification);
         return;
     }
 
@@ -136,18 +135,12 @@ createWindow = (reqbody) => {
     });
 
     notifWindow.on('close', (event) => {
-
-        let notification = _.findWhere(notifications, {
-            id: event.sender.webContents.id
-        });
-
-        if (!_.isUndefined(notification)) {
-            notifications = _.without(notifications, notification);
-        }
+        lwm.remove(event.sender.webContents.id);
     });
 
-    new_notification = _.defaults(new_notification, {id:notifWindow.webContents.id});
-    notifications.push(new_notification);
+    lw = new LinWindow(notifWindow.webContents.id, new_notification.package);
+    lw.push(new_notification);
+    lwm.push(lw);
 };
 
 app.on('ready', async () => {
@@ -167,12 +160,12 @@ app.on('ready', async () => {
 
 ipcMain.handle('ready', async (event, data) => {
 
-    let notification = _.findWhere(notifications, {
-        id: event.sender.id,
-    });
-
-    if (!_.isUndefined(notification)) {
-        webContents.fromId(event.sender.id).send('notification-data', notification);
+    console.log(event.sender.id);
+    let lw = lwm.findWindowById(event.sender.id);
+    if (!_.isUndefined(lw)) {
+        lw.notifications.forEach((n) => {
+            webContents.fromId(event.sender.id).send('notification-data', n);
+        });
     }
 });
 
