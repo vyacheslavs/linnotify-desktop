@@ -47,10 +47,11 @@ app.on('window-all-closed', () => {
     // do not quit when no windows around
 });
 
+var mainWindow = null;
+
 createWindow = (reqbody) => {
 
     let notification = _.findWhere(notifications, {
-        notify_id: reqbody.id,
         package: reqbody.package,
     });
 
@@ -87,30 +88,36 @@ createWindow = (reqbody) => {
     if (new_notification.removal) // do not show new notification for removal
         return;
 
-    let mainWindow = null;
+    let notifWindow = null;
 
-    mainWindow = new BrowserWindow({
+    notifWindow = new BrowserWindow({
         width: 800,
         height: 600,
+        frame: false,
+        transparent: true,
+        alwaysOnTop: true,
+        focusable: false,
         webPreferences: {
             contextIsolation: true,
             preload: path.join(__dirname, './preload.js'),
         }
     });
 
+    // notifWindow.setSkipTaskbar(true);
+
     // If you want to open up dev tools programmatically, call
     // mainWindow.openDevTools();
 
     // Load the ember application
-    mainWindow.loadURL(emberAppURL);
+    notifWindow.loadURL(emberAppURL);
 
     // If a loading operation goes wrong, we'll send Electron back to
     // Ember App entry point
-    mainWindow.webContents.on('did-fail-load', () => {
-        mainWindow.loadURL(emberAppURL);
+    notifWindow.webContents.on('did-fail-load', () => {
+        notifWindow.loadURL(emberAppURL);
     });
 
-    mainWindow.webContents.on('render-process-gone', (_event, details) => {
+    notifWindow.webContents.on('render-process-gone', (_event, details) => {
         if (details.reason === 'killed' || details.reason === 'clean-exit') {
             return;
         }
@@ -120,17 +127,17 @@ createWindow = (reqbody) => {
         console.log('Reason: ' + details.reason);
     });
 
-    mainWindow.on('unresponsive', () => {
+    notifWindow.on('unresponsive', () => {
         console.log(
             'Your Ember app (or other code) has made the window unresponsive.'
         );
     });
 
-    mainWindow.on('responsive', () => {
+    notifWindow.on('responsive', () => {
         console.log('The main window has become responsive again.');
     });
 
-    mainWindow.on('close', (event) => {
+    notifWindow.on('close', (event) => {
 
         let notification = _.findWhere(notifications, {
             id: event.sender.webContents.id
@@ -138,11 +145,10 @@ createWindow = (reqbody) => {
 
         if (!_.isUndefined(notification)) {
             notifications = _.without(notifications, notification);
-            console.log(notifications);
         }
     });
 
-    new_notification = _.defaults(new_notification, {id:mainWindow.webContents.id});
+    new_notification = _.defaults(new_notification, {id:notifWindow.webContents.id});
     notifications.push(new_notification);
 };
 
@@ -157,7 +163,15 @@ app.on('ready', async () => {
         }
     }
 
+    mainWindow = new BrowserWindow({
+        titleBarStyle: 'hidden',
+        width: 1920,
+        height: 1080,
+        show: false // don't show the main window
+    });
+
     await handleFileUrls(emberAppDir);
+
 });
 
 ipcMain.handle('ready', async (event, data) => {
@@ -169,7 +183,13 @@ ipcMain.handle('ready', async (event, data) => {
     if (!_.isUndefined(notification)) {
         webContents.fromId(event.sender.id).send('notification-data', notification);
     }
-})
+});
+
+ipcMain.handle('control', async (event, data) => {
+    if (data == 'close') {
+        BrowserWindow.fromWebContents(webContents.fromId(event.sender.id)).close();
+    }
+});
 
 // Handle an unhandled error in the main thread
 //
