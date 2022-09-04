@@ -96,6 +96,7 @@ createWindow = (reqbody) => {
         frame: false,
         transparent: true,
         alwaysOnTop: true,
+        useContentSize: true,
         focusable: false,
         webPreferences: {
             contextIsolation: true,
@@ -103,10 +104,7 @@ createWindow = (reqbody) => {
         }
     });
 
-    // notifWindow.setSkipTaskbar(true);
-
-    // If you want to open up dev tools programmatically, call
-    // mainWindow.openDevTools();
+    // notifWindow.openDevTools();
 
     // Load the ember application
     notifWindow.loadURL(emberAppURL);
@@ -163,13 +161,6 @@ app.on('ready', async () => {
         }
     }
 
-    mainWindow = new BrowserWindow({
-        titleBarStyle: 'hidden',
-        width: 1920,
-        height: 1080,
-        show: false // don't show the main window
-    });
-
     await handleFileUrls(emberAppDir);
 
 });
@@ -186,8 +177,12 @@ ipcMain.handle('ready', async (event, data) => {
 });
 
 ipcMain.handle('control', async (event, data) => {
-    if (data == 'close') {
+    if (data.action == 'close') {
         BrowserWindow.fromWebContents(webContents.fromId(event.sender.id)).close();
+    } else if (data.action == "resize") {
+        data.width += 20;
+        data.height += 20;
+        BrowserWindow.fromWebContents(webContents.fromId(event.sender.id)).setContentSize(data.width, data.height);
     }
 });
 
