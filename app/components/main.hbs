@@ -1,8 +1,7 @@
 
 <div class="toast toast--blue" id="notification" {{did-resize this.onRender}}>
-
-  <div class="toast__icon">
 {{! template-lint-disable }}
+  <div class="toast__icon">
 {{#if this.main_notification.icon}}
 <img width="42" height="42" src="data:image/png;base64,{{this.main_notification.icon}}" />
 {{else}}
@@ -24,20 +23,37 @@
 
 
 {{/if}}
-{{! template-lint-enable }}
   </div>
   <div class="toast__content">
     <p class="toast__type">{{this.main_notification.title}}</p>
     <p class="toast__message">{{this.main_notification.text}}</p>
     {{#if this.main_notification.big_text}}
-    <details>
-        <summary>More</summary>
-        <pre>{{this.main_notification.big_text}}</pre>
-    </details>
+      <details class="big_text">
+          <summary>More</summary>
+          <pre>{{this.main_notification.big_text}}</pre>
+      </details>
+    {{/if}}
+    {{#if this.multiple_notifications}}
+    <div class="other_notifications">
+
+      {{#each this.notifications as |notification|}}
+      <div class="sub_notification">
+      <div class="sub_notification_close" {{on "click" (fn this.closeSubNotification notification.notify_id)}}>
+        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15.642 15.642" xmlns:xlink="http://www.w3.org/1999/xlink" enable-background="new 0 0 15.642 15.642">
+          <path fill-rule="evenodd" d="M8.882,7.821l6.541-6.541c0.293-0.293,0.293-0.768,0-1.061  c-0.293-0.293-0.768-0.293-1.061,0L7.821,6.76L1.28,0.22c-0.293-0.293-0.768-0.293-1.061,0c-0.293,0.293-0.293,0.768,0,1.061  l6.541,6.541L0.22,14.362c-0.293,0.293-0.293,0.768,0,1.061c0.147,0.146,0.338,0.22,0.53,0.22s0.384-0.073,0.53-0.22l6.541-6.541  l6.541,6.541c0.147,0.146,0.338,0.22,0.53,0.22c0.192,0,0.384-0.073,0.53-0.22c0.293-0.293,0.293-0.768,0-1.061L8.882,7.821z"></path>
+      </svg>
+      </div>
+      </div>
+
+        <details>
+          <summary>{{notification.title}}</summary>
+          {{notification.text}}
+        </details>
+      {{/each}}
+    </div>
     {{/if}}
 
   </div>
-  {{! template-lint-disable }}
   <div class="toast__close" {{on "click" this.closeWindow}}>
     <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15.642 15.642" xmlns:xlink="http://www.w3.org/1999/xlink" enable-background="new 0 0 15.642 15.642">
       <path fill-rule="evenodd" d="M8.882,7.821l6.541-6.541c0.293-0.293,0.293-0.768,0-1.061  c-0.293-0.293-0.768-0.293-1.061,0L7.821,6.76L1.28,0.22c-0.293-0.293-0.768-0.293-1.061,0c-0.293,0.293-0.293,0.768,0,1.061  l6.541,6.541L0.22,14.362c-0.293,0.293-0.293,0.768,0,1.061c0.147,0.146,0.338,0.22,0.53,0.22s0.384-0.073,0.53-0.22l6.541-6.541  l6.541,6.541c0.147,0.146,0.338,0.22,0.53,0.22c0.192,0,0.384-0.073,0.53-0.22c0.293-0.293,0.293-0.768,0-1.061L8.882,7.821z"></path>
