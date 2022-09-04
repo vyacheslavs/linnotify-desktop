@@ -8,7 +8,8 @@ const { app, ipcMain, BrowserWindow, webContents } = require('electron');
 const path = require('path');
 const isDev = require('electron-is-dev');
 const handleFileUrls = require('./handle-file-urls');
-const { LinWindow, LinWindowManager } = require('./linwindow');
+const { LinWindow, LinWindowManager, LinWindowPlacementManager } = require('./linwindow');
+const { ClassicPlacement } = require('./classic-placement');
 
 const emberAppDir = path.resolve(__dirname, '..', 'ember-dist');
 const emberAppURL = pathToFileURL(
@@ -19,6 +20,7 @@ const emberAppURL = pathToFileURL(
 // each window can have a lot of notifications
 
 var lwm = new LinWindowManager();
+var lwp = new ClassicPlacement(lwm);
 
 var _ = require('underscore');
 
@@ -159,8 +161,6 @@ app.on('ready', async () => {
 });
 
 ipcMain.handle('ready', async (event, data) => {
-
-    console.log(event.sender.id);
     let lw = lwm.findWindowById(event.sender.id);
     if (!_.isUndefined(lw)) {
         lw.notifications.forEach((n) => {
@@ -176,6 +176,12 @@ ipcMain.handle('control', async (event, data) => {
         data.width += 20;
         data.height += 20;
         BrowserWindow.fromWebContents(webContents.fromId(event.sender.id)).setContentSize(data.width, data.height);
+        let lw = lwm.findWindowById(event.sender.id);
+        if (!_.isUndefined(lw)) {
+            lw.width = data.width;
+            lw.height = data.height;
+            lwm.place();
+        }
     }
 });
 
