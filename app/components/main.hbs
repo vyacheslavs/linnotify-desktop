@@ -29,6 +29,13 @@
   <div class="toast__content">
     <p class="toast__type">{{this.title}}</p>
     <p class="toast__message">{{this.text}}</p>
+    {{#if this.big_text}}
+    <details>
+        <summary>More</summary>
+        <pre>{{this.big_text}}</pre>
+    </details>
+    {{/if}}
+
   </div>
   {{! template-lint-disable }}
   <div class="toast__close" {{on "click" this.closeWindow}}>
