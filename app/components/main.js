@@ -24,6 +24,14 @@ export default class MainComponent extends Component {
 
   @action
   closeWindow() {
-    api.send('control', 'close');
+    api.send('control', { action: 'close' });
+  }
+
+  onRender(entry) {
+    api.send('control', {
+      action: 'resize',
+      width: entry.borderBoxSize[0].inlineSize,
+      height: entry.borderBoxSize[0].blockSize,
+    });
   }
 }
