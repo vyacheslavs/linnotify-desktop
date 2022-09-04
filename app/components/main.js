@@ -5,23 +5,37 @@ import { action } from '@ember/object';
 /*global api*/
 
 export default class MainComponent extends Component {
-  @tracked title = '';
-  @tracked text = '';
-  @tracked winId = undefined;
-  @tracked icon = '';
-  @tracked big_text = '';
+  @tracked main_notification = null;
+
+  notifications = [];
 
   constructor(owner, args) {
     super(owner, args);
 
     if (typeof api !== 'undefined') {
       api.handle('notification-data', (data) => {
-        this.title = data.title;
-        this.text = data.text;
-        this.winId = data.id;
-        this.icon = typeof data.icon != 'undefined' ? data.icon : '';
-        this.big_text =
-          typeof data.big_text != 'undefined' ? data.big_text : '';
+        let notification = Object.assign({}, data);
+        let idx = 0;
+        for (idx = 0; idx < this.notifications.length; idx++)
+          if (this.notifications[idx].notify_id == notification.notify_id)
+            break;
+
+        if (idx == this.notifications.length) {
+          if (!notification.removal) this.notifications.push(notification);
+        } else {
+          if (notification.removal) {
+            this.notifications.splice(idx, 1);
+          } else {
+            this.notifications[idx] = notification;
+          }
+        }
+
+        if (this.notifications.length > 0)
+          this.main_notification = this.notifications[0];
+        else {
+          // no notification left here, remove this window
+          this.closeWindow();
+        }
       });
       api.send('ready', 'ready to listen');
     }
