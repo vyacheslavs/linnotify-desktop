@@ -105,7 +105,7 @@ createWindow = (reqbody) => {
         }
     });
 
-    // notifWindow.openDevTools();
+    // notifWindow.openDevTools({mode: 'undocked'});
 
     // Load the ember application
     notifWindow.loadURL(emberAppURL);

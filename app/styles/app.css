@@ -37,13 +37,7 @@
 
 .toast__icon{
   position:absolute;
-  top:50%;
-  left:22px;
-  transform:translateY(-50%);
-  width:14px;
-  height:14px;
-  padding: 7px;
-  border-radius:50%;
+  padding-left: 14px;
   display:inline-block;
 }
 
@@ -83,10 +77,6 @@
 
 .toast--green:before{
   background-color:#2BDE3F;
-}
-
-.toast--blue .toast__icon{
-  background-color:#1D72F3;
 }
 
 .toast--blue:before{
