@@ -16,7 +16,7 @@
     padding: 21px 0;
     background-color:#fff;
     border-radius:4px;
-    max-width: 500px;
+    max-width: 700px;
     top: 0px;
     position:relative;
     box-shadow: 1px 7px 14px -5px rgba(0,0,0,0.2);
@@ -89,4 +89,28 @@
 
 .toast--yellow:before{
   background-color:#FFC007;
+}
+
+
+.toast__content details {
+  margin-top: .5em;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  padding: .5em .5em 0;
+  overflow-x: auto;
+}
+
+.toast__content summary {
+  font-weight: bold;
+  margin: -.5em -.5em 0;
+  padding: .5em;
+}
+
+.toast__content details[open] {
+  padding: .5em;
+}
+
+.toast__content details[open] summary {
+  border-bottom: 1px solid #aaa;
+  margin-bottom: .5em;
 }
