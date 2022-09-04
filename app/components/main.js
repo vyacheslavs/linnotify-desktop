@@ -8,6 +8,7 @@ export default class MainComponent extends Component {
   @tracked title = '';
   @tracked text = '';
   @tracked winId = undefined;
+  @tracked icon = '';
 
   constructor(owner, args) {
     super(owner, args);
@@ -17,6 +18,8 @@ export default class MainComponent extends Component {
         this.title = data.title;
         this.text = data.text;
         this.winId = data.id;
+        this.icon = '';
+        if (typeof data.icon != 'undefined') this.icon = data.icon;
       });
       api.send('ready', 'ready to listen');
     }
