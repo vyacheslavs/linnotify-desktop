@@ -20,6 +20,7 @@ class ClassicPlacement extends LinWindowPlacementManager {
                     y -= win.height;
                     x = width - win.width;
                     w.setPosition(x, y);
+                    w.show();
                 }
             }
         });
