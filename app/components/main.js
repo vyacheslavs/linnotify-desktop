@@ -16,6 +16,10 @@ export default class MainComponent extends Component {
       api.handle('notification-data', (data) => {
         let notification = Object.assign({}, data);
         let idx = 0;
+
+        if (notification.text == notification.big_text)
+          notification.big_text = null;
+
         for (idx = 0; idx < this.notifications.length; idx++)
           if (this.notifications[idx].notify_id == notification.notify_id)
             break;

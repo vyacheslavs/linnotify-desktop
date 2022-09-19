@@ -99,6 +99,7 @@ createWindow = (reqbody) => {
         alwaysOnTop: true,
         useContentSize: true,
         focusable: false,
+        show: false,
         webPreferences: {
             contextIsolation: true,
             preload: path.join(__dirname, './preload.js'),
