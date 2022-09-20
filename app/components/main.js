@@ -20,17 +20,18 @@ export default class MainComponent extends Component {
         if (notification.text == notification.big_text)
           notification.big_text = null;
 
-        if (typeof notification.ongoing != 'undefined' &&
-            notification.ongoing) {
-
-            if (typeof notification.progress_indeterminate == 'undefined')
-              notification.progress_indeterminate = false;
-            if (notification.progress_indeterminate == false) {
-              if (typeof notification.progress == 'undefined')
-                notification.progress_indeterminate = true;
-                if (typeof notification.progress_max == 'undefined')
-                notification.progress_indeterminate = true;
-            }
+        if (
+          typeof notification.ongoing != 'undefined' &&
+          notification.ongoing
+        ) {
+          if (typeof notification.progress_indeterminate == 'undefined')
+            notification.progress_indeterminate = false;
+          if (notification.progress_indeterminate == false) {
+            if (typeof notification.progress == 'undefined')
+              notification.progress_indeterminate = true;
+            if (typeof notification.progress_max == 'undefined')
+              notification.progress_indeterminate = true;
+          }
         }
 
         for (idx = 0; idx < this.notifications.length; idx++)
