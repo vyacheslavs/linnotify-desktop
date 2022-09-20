@@ -6,12 +6,12 @@ import { hbs } from 'ember-cli-htmlbars';
 module('Integration | Helper | calc-percent', function (hooks) {
   setupRenderingTest(hooks);
 
-  // TODO: Replace this with your real tests.
   test('it renders', async function (assert) {
-    this.set('inputValue', '1234');
+    this.set('inputValue1', '45');
+    this.set('inputValue2', '100');
 
-    await render(hbs`{{calc-percent this.inputValue}}`);
+    await render(hbs`{{calc-percent this.inputValue1 this.inputValue2}}`);
 
-    assert.dom(this.element).hasText('1234');
+    assert.dom(this.element).hasText('45');
   });
 });
