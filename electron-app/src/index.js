@@ -66,6 +66,7 @@ createWindow = (reqbody) => {
             removal: reqbody.removal,
             package: reqbody.package,
             ...(!_.isUndefined(reqbody.big_text)) && { big_text: reqbody.big_text },
+            ...(!_.isUndefined(reqbody.ongoing)) && { ongoing: reqbody.ongoing },
             ...(!_.isUndefined(reqbody.progress)) && { progress: reqbody.progress },
             ...(!_.isUndefined(reqbody.progress_indeterminate)) && { progress_indeterminate: reqbody.progress_indeterminate },
             ...(!_.isUndefined(reqbody.progress_max)) && { progress_max: reqbody.progress_max },
@@ -174,7 +175,7 @@ ipcMain.handle('control', async (event, data) => {
     if (data.action == 'close') {
         BrowserWindow.fromWebContents(webContents.fromId(event.sender.id)).close();
     } else if (data.action == "resize") {
-        data.width += 20;
+        data.width += 40;
         data.height += 20;
         BrowserWindow.fromWebContents(webContents.fromId(event.sender.id)).setContentSize(data.width, data.height);
         let lw = lwm.findWindowById(event.sender.id);

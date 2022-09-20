@@ -61,6 +61,19 @@
   </div>
   {{! template-lint-enable }}
 </div>
+{{#if this.main_notification.ongoing}}
+
+{{#if this.main_notification.progress_indeterminate}}
+<div class="w-full">
+    <div class="w-half fluentProgressBar-waiting"></div>
+</div>
+{{else}}
+<div class="w-full">
+    <div class="fluentProgressBar-normal" style="width: 85%"></div>
+</div>
+{{/if}}
+
+{{/if}}
 
 
 {{yield}}
