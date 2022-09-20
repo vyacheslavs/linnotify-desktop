@@ -1,6 +1,5 @@
-
-<div class="toast toast--blue" id="notification" {{did-resize this.onRender}}>
 {{! template-lint-disable }}
+<div class="toast toast--blue" id="notification" {{did-resize this.onRender}}>
   <div class="toast__icon">
 {{#if this.main_notification.icon}}
 <img width="42" height="42" src="data:image/png;base64,{{this.main_notification.icon}}" />
@@ -59,7 +58,6 @@
       <path fill-rule="evenodd" d="M8.882,7.821l6.541-6.541c0.293-0.293,0.293-0.768,0-1.061  c-0.293-0.293-0.768-0.293-1.061,0L7.821,6.76L1.28,0.22c-0.293-0.293-0.768-0.293-1.061,0c-0.293,0.293-0.293,0.768,0,1.061  l6.541,6.541L0.22,14.362c-0.293,0.293-0.293,0.768,0,1.061c0.147,0.146,0.338,0.22,0.53,0.22s0.384-0.073,0.53-0.22l6.541-6.541  l6.541,6.541c0.147,0.146,0.338,0.22,0.53,0.22c0.192,0,0.384-0.073,0.53-0.22c0.293-0.293,0.293-0.768,0-1.061L8.882,7.821z"></path>
    </svg>
   </div>
-  {{! template-lint-enable }}
 </div>
 {{#if this.main_notification.ongoing}}
 
@@ -69,11 +67,12 @@
 </div>
 {{else}}
 <div class="w-full">
-    <div class="fluentProgressBar-normal" style="width: 85%"></div>
+    <div class="fluentProgressBar-normal" style="width: {{calc-percent this.main_notification.progress this.main_notification.progress_max}}%"></div>
 </div>
 {{/if}}
 
 {{/if}}
 
+{{! template-lint-enable }}
 
 {{yield}}
