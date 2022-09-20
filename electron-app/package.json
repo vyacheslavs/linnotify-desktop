@@ -37,7 +37,13 @@
         },
         {
           "name": "@electron-forge/maker-deb",
-          "config": {}
+           "config": {
+              "options": {
+                "maintainer": "V.Shegai",
+                "description": "Shows notification from android",
+                "productDescription": "LinNotify desktop version receives all notification from LinNotify android application"
+              }
+           }
         },
         {
           "name": "@electron-forge/maker-rpm",
