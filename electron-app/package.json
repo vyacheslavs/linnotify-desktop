@@ -1,7 +1,7 @@
 {
   "name": "linnotify",
   "productName": "linnotify",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Small description for linnotify goes here",
   "main": "src/index.js",
   "scripts": {
@@ -37,7 +37,13 @@
         },
         {
           "name": "@electron-forge/maker-deb",
-          "config": {}
+           "config": {
+              "options": {
+                "maintainer": "V.Shegai",
+                "description": "Shows notification from android",
+                "productDescription": "LinNotify desktop version receives all notification from LinNotify android application"
+              }
+           }
         },
         {
           "name": "@electron-forge/maker-rpm",
